@@ -1,0 +1,65 @@
+<div class="container">
+    <div color="primary" class="buttons_wrapp">
+        <mat-error *ngIf="cancelarFormButton.hasError('selectedItens') === true">
+            <button
+                (click)="openDialog(2,'150ms', '250ms','Não é possivel fazer isso ainda:','Você precisa selecionar os itens para deleta-los.',[{buttonMessage: 'Ok', buttonColor:'primary' }])"
+                color="disabled" [formControl]="cancelarFormButton" mat-raised-button
+                matTooltip="Selecione o item, e clique aqui para remove-lo." [matTooltipPosition]="position.value!">
+                <mat-icon>delete_outline</mat-icon>
+                <span>Remover</span>
+
+            </button>
+            <button mat-raised-button color="warn"
+                (click)="openDialog(1,'150ms', '200ms', undefined,undefined,undefined)"
+                matTooltip="Clique aqui para adicionar um item novo.">
+
+
+                <mat-icon>note_add</mat-icon>
+                <span>Adicicionar</span>
+            </button>
+        </mat-error>
+        <mat-error *ngIf="!cancelarFormButton.hasError('selectedItens')">
+            <button [formControl]="cancelarFormButton" mat-raised-button color="primary"
+                matTooltip="Selecione o item, e clique aqui para remove-lo." [matTooltipPosition]="position.value!">
+                <mat-icon>delete_outline</mat-icon>
+                <span>Remover</span>
+
+            </button>
+            <button mat-raised-button color="warn"
+                (click)="openDialog(1,'150ms', '200ms', undefined,undefined,undefined)"
+                matTooltip="Clique aqui para adicionar um item novo." [matTooltipPosition]="position.value!">
+
+
+                <mat-icon>note_add</mat-icon>
+                <span>Adicicionar</span>
+            </button>
+        </mat-error>
+
+
+    </div>
+
+    <div class="table-wrapper">
+        
+          
+          <div class="mat-elevation-z8">
+            <table matSort matSortActive="carbs" matSortDirection="asc">
+                <tr>
+                  <th mat-sort-header="name">Dessert (100g)</th>
+                  <th mat-sort-header="calories">Calories</th>
+                  <th mat-sort-header="fat">Fat (g)</th>
+                  <th mat-sort-header="carbs">Carbs (g)</th>
+                  <th mat-sort-header="protein">Protein (g)</th>
+                </tr>
+              
+                <tr *ngFor="let dessert of sortedData">
+                  <td>{{dessert.name}}</td>
+                  <td>{{dessert.calories}}</td>
+                  <td>{{dessert.fat}}</td>
+                  <td>{{dessert.carbs}}</td>
+                  <td>{{dessert.protein}}</td>
+                </tr>
+              </table>
+        </div>
+          
+    </div>
+</div>

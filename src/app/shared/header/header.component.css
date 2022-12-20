@@ -1,0 +1,10 @@
+.container{
+    width: 100%;
+    height: 100%;
+    display:flex;
+    flex-flow:row wrap;
+    justify-content: center;
+    font-weight: 100;
+    text-transform: uppercase;
+    align-items: center;
+}

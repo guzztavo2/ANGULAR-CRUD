@@ -1,0 +1,18 @@
+<div class="dialog">
+    <mat-toolbar mat-dialog-title color="warn">
+        <span>{{data.title}}</span>
+      </mat-toolbar>
+    <div class="contentDialog" mat-dialog-content>
+        <h2>{{data.message}}</h2>
+    </div>
+
+
+    <div mat-dialog-actions>      
+        <div *ngFor="let item of data.buttons">
+                
+                <button mat-dialog-close mat-raised-button color="{{item.buttonColor}}">{{item.buttonMessage}}</button>
+
+        </div>
+    </div>
+
+</div>
