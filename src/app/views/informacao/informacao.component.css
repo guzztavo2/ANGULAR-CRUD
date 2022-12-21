@@ -8,17 +8,18 @@ div.buttons_wrapp {
     height: 7%;
     min-height: 80px;
     background-color: white;
-
-}
-
-div.buttons_wrapp > mat-error {
-    width: 100%;
-    height: 100%;
     display: flex;
     flex-flow: row wrap;
     justify-content: center;
     align-items: center;
+
 }
+
+/* div.buttons_wrapp > mat-error {
+    width: 100%;
+    height: 100%;
+
+} */
 
 div.buttons_wrapp button {
     width: calc(100% / 2 - 2%);
@@ -68,15 +69,15 @@ div.dialog .contentDialog .input {
 
 }
 div.container div.table-wrapper{
-    background-color: red;
+    background-color: #ccc;
     display:flex;
     flex-flow:column nowrap;
     padding: 1% 2%;
     height: 90%;
-    width: 96%;
+    width: 100%;
+    min-height: 500px;
 }
 div.container div.table-wrapper mat-form-field{
-    background-color: green;
     height: 10%;
     min-height: 80px;
 }

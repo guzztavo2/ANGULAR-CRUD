@@ -17,9 +17,11 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
-import {MatTableModule} from '@angular/material/table'; 
-import {MatPaginatorModule} from '@angular/material/paginator'; 
-import {MatCheckboxModule} from '@angular/material/checkbox'; 
+import {MatTableModule} from '@angular/material/table';
+import {MatPaginatorIntl, MatPaginatorModule} from '@angular/material/paginator';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import { Subject } from 'rxjs';
+import { $localize } from '@angular/localize/init';
 @NgModule({
   declarations: [
     AppComponent,
@@ -45,13 +47,15 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
     MatInputModule,
     MatTableModule,
     MatPaginatorModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatPaginatorModule
   ],
   exports: [
     MatFormFieldModule,
     MatInputModule
   ],
-  providers: [],
+  providers: [{provide: MatPaginatorIntl, useClass: MatPaginatorIntl}],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  }

@@ -1,59 +1,22 @@
-import { Inject,AfterViewInit, Component, ViewChild } from '@angular/core';
-import { FormControl, ValidatorFn } from '@angular/forms';
-import { MatDialog, MatDialogRef,MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Inject, AfterViewInit, Component, ViewChild} from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TooltipPosition } from '@angular/material/tooltip';
 import { Validators } from '@angular/forms';
-import {MatPaginator} from '@angular/material/paginator';
-import {MatSort, Sort} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
-import {SelectionModel} from '@angular/cdk/collections';
-
-export interface UserData {
-  id: string;
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import { SelectionModel } from '@angular/cdk/collections';
+import { Router } from '@angular/router';
+import { informacao } from 'src/app/model/model.informacao';
+import { MatPaginator } from '@angular/material/paginator';
+export interface PeriodicElement {
   name: string;
-  progress: string;
-  fruit: string;
+  position: number;
+  weight: number;
+  symbol: string;
 }
 
-/** Constants used to fill up our data base. */
-const FRUITS: string[] = [
-  'blueberry',
-  'lychee',
-  'kiwi',
-  'mango',
-  'peach',
-  'lime',
-  'pomegranate',
-  'pineapple',
-];
-const NAMES: string[] = [
-  'Maia',
-  'Asher',
-  'Olivia',
-  'Atticus',
-  'Amelia',
-  'Jack',
-  'Charlotte',
-  'Theodore',
-  'Isla',
-  'Oliver',
-  'Isabella',
-  'Jasper',
-  'Cora',
-  'Levi',
-  'Violet',
-  'Arthur',
-  'Mia',
-  'Thomas',
-  'Elizabeth',
-];
-
-
-
-
-
-
+const ELEMENT_DATA: informacao[] = informacao.gerarInformacoes(20);
 
 
 
@@ -68,39 +31,58 @@ const NAMES: string[] = [
   styleUrls: ['./informacao.component.css']
 })
 
-export class InformacaoComponent implements AfterViewInit {
-
-  displayedColumns: string[] = ['*','id', 'name', 'progress', 'fruit'];
-  dataSource!: MatTableDataSource<UserData>;
-  selection = new SelectionModel<UserData>(true, []);
-  public static quantidadeSelected:number = 0;
-
-
-
+export class InformacaoComponent  implements AfterViewInit   {
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  getColorSelected() {
+    if (this.verificarSelected()) {
+      return 'primary';
+    } else {
+      return 'disabled';
+    }
+  }
+  verificarSelected(): boolean {
+    if (this.selection.selected.length > 0)
+      return true;
+    else
+      return false;
+  }
+  btnRemoverAction(currentBtn: any) {
+    let currentColor: string = currentBtn.getAttribute('ng-reflect-color');
+    console.log(currentColor);
+    if (currentColor === 'disabled') {
+      this.openDialog(2, '150ms', '250ms', 'Não é possivel fazer isso ainda:', 'Você precisa selecionar os itens para deleta-los.', [{ buttonMessage: 'Ok', buttonColor: 'primary' }]);
+    }
+    else {
+      this.openDialog(2, '150ms', '250ms', 'Tudo certo!', 'Já vamos deletear os itens para você.', [{ buttonMessage: 'Ok', buttonColor: 'warn' }]);
+
+    }
+  }
+
+  constructor(public dialog: MatDialog) {
+    informacao.gerarInformacoes(5);
+  }
 
 
+  router: Router = new Router();
+  positionOptions: TooltipPosition[] = ['below'];
+  cancelarFormButton = new FormControl();
+  position = new FormControl(this.positionOptions[0]);
+  displayedColumns: string[] = ['select', 'id', 'informacao', 'dataCriacao', 'dataAtualizacao'];
+  dataSource = new MatTableDataSource<informacao>(ELEMENT_DATA);
+  selection = new SelectionModel<informacao>(true, []);
+
+  /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
+
     const numSelected = this.selection.selected.length;
     const numRows = this.dataSource.data.length;
-
     return numSelected === numRows;
   }
-  toggleRow(row:any){
-    this.selection.toggle(row)
-    const numSelected = this.selection.selected.length;
-  if(numSelected != 0){
 
-  }
-    // InformacaoComponent.quantidadeSelected = 1;
-
-    // this.cancelarFormButton = new FormControl('',[Validators.required,cancelarBtnFormValidator]);
-
-  }
+  /** Selects all rows if they are not all selected; otherwise clear selection. */
   toggleAllRows() {
-
     if (this.isAllSelected()) {
       this.selection.clear();
       return;
@@ -108,7 +90,9 @@ export class InformacaoComponent implements AfterViewInit {
 
     this.selection.select(...this.dataSource.data);
   }
-  checkboxLabel(row?: UserData): string {
+
+  /** The label for the checkbox on the passed row */
+  checkboxLabel(row?: informacao): string {
     if (!row) {
       return `${this.isAllSelected() ? 'deselect' : 'select'} all`;
     }
@@ -116,48 +100,35 @@ export class InformacaoComponent implements AfterViewInit {
   }
 
 
-  constructor(public dialog: MatDialog) {
-    this.cancelarFormButton = new FormControl('',[Validators.required,cancelarBtnFormValidator]);
+  openDialog(typeDialog: number, enterAnimationDuration: string, exitAnimationDuration: string, title: any, message: any, buttons: any): void {
 
-    const users = Array.from({length: 100}, (_, k) => createNewUser(k + 1));
-
-    this.dataSource = new MatTableDataSource(users);
-  }
-  positionOptions: TooltipPosition[] = ['below'];
-  cancelarFormButton: any;
-  position = new FormControl(this.positionOptions[0]);
-  
-  
-  
-  openDialog(typeDialog:number, enterAnimationDuration: string, exitAnimationDuration: string, title:any, message:any, buttons:any ): void {
-
-    switch(typeDialog){
+    switch (typeDialog) {
       case 1:
         const dialogRef = this.dialog.open(DialogAdicao, {
           width: '45%',
           minWidth: '350px',
           enterAnimationDuration,
           exitAnimationDuration,
-          data:{informacao: ''}
+          data: { informacao: '' }
         });
         dialogRef.afterClosed().subscribe(result => {
-          if(result !== undefined){
+          if (result !== undefined) {
             console.log(result);
             alert('a');
           }
 
         })
-      break;
+        break;
       case 2:
-        this.dialog.open(customDialog,{
+        this.dialog.open(customDialog, {
           width: '25%',
           minWidth: '150px',
           enterAnimationDuration,
           exitAnimationDuration,
-          data:{title: title, message:message, buttons:buttons}
+          data: { title: title, message: message, buttons: buttons }
         })
     }
-  } 
+  }
 
 
   ngAfterViewInit() {
@@ -173,35 +144,7 @@ export class InformacaoComponent implements AfterViewInit {
     }
   }
 }
-function createNewUser(id: number): UserData {
-  const name =
-    NAMES[Math.round(Math.random() * (NAMES.length - 1))] +
-    ' ' +
-    NAMES[Math.round(Math.random() * (NAMES.length - 1))].charAt(0) +
-    '.';
 
-  return {
-    id: id.toString(),
-    name: name,
-    progress: Math.round(Math.random() * 100).toString(),
-    fruit: FRUITS[Math.round(Math.random() * (FRUITS.length - 1))],
-  };
-}
-function cancelarBtnFormValidator(control: FormControl) {
-  (1)
-
-
-  if (InformacaoComponent.quantidadeSelected === 0) {
-    return {
-      selectedItens: {
-        selectedItens: false
-      }
-    }
-  }
-  
-  return null; (6)
-
-}
 
 
 
@@ -226,12 +169,12 @@ export class DialogAdicao {
     this.informacaoFormControl = informacaoFormControl;
   }
   position = new FormControl(this.positionOptions[0]);
-  
 
-  public exitDialog(){
+
+  public exitDialog() {
     this.dialogRef.close();
   }
-} 
+}
 
 @Component({
   selector: 'customDialog',
@@ -243,16 +186,16 @@ export class DialogAdicao {
 })
 
 export class customDialog {
-private title!:string|undefined;
-private message!:string|undefined;
-private buttons!: []|undefined|string;
+  private title!: string | undefined;
+  private message!: string | undefined;
+  private buttons!: [] | undefined | string;
 
-  constructor( 
+  constructor(
     public dialogRef: MatDialogRef<customDialog>,
     @Inject(MAT_DIALOG_DATA) public data: any
-    ) {
-      dialogRef.afterClosed().subscribe();
+  ) {
+    dialogRef.afterClosed().subscribe();
   }
 
 
-} 
+}
