@@ -7,15 +7,47 @@ import {MatPaginator} from '@angular/material/paginator';
 import {MatSort, Sort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import {SelectionModel} from '@angular/cdk/collections';
 
-
-export interface Dessert {
-  calories: number;
-  carbs: number;
-  fat: number;
+export interface UserData {
+  id: string;
   name: string;
-  protein: number;
+  progress: string;
+  fruit: string;
 }
+
+/** Constants used to fill up our data base. */
+const FRUITS: string[] = [
+  'blueberry',
+  'lychee',
+  'kiwi',
+  'mango',
+  'peach',
+  'lime',
+  'pomegranate',
+  'pineapple',
+];
+const NAMES: string[] = [
+  'Maia',
+  'Asher',
+  'Olivia',
+  'Atticus',
+  'Amelia',
+  'Jack',
+  'Charlotte',
+  'Theodore',
+  'Isla',
+  'Oliver',
+  'Isabella',
+  'Jasper',
+  'Cora',
+  'Levi',
+  'Violet',
+  'Arthur',
+  'Mia',
+  'Thomas',
+  'Elizabeth',
+];
 
 
 
@@ -36,30 +68,60 @@ export interface Dessert {
   styleUrls: ['./informacao.component.css']
 })
 
-export class InformacaoComponent {
+export class InformacaoComponent implements AfterViewInit {
+
+  displayedColumns: string[] = ['*','id', 'name', 'progress', 'fruit'];
+  dataSource!: MatTableDataSource<UserData>;
+  selection = new SelectionModel<UserData>(true, []);
+  public static quantidadeSelected:number = 0;
+
+
 
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-  desserts: Dessert[] = [
-    {name: 'Frozen yogurt', calories: 159, fat: 6, carbs: 24, protein: 4},
-    {name: 'Ice cream sandwich', calories: 237, fat: 9, carbs: 37, protein: 4},
-    {name: 'Eclair', calories: 262, fat: 16, carbs: 24, protein: 6},
-    {name: 'Cupcake', calories: 305, fat: 4, carbs: 67, protein: 4},
-    {name: 'Gingerbread', calories: 356, fat: 16, carbs: 49, protein: 4},
-  ];
-  sortedData: Dessert[];
 
 
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource.data.length;
 
-  constructor(public dialog: MatDialog, private _liveAnnouncer: LiveAnnouncer) {
+    return numSelected === numRows;
+  }
+  toggleRow(row:any){
+    this.selection.toggle(row)
+    const numSelected = this.selection.selected.length;
+  if(numSelected != 0){
+
+  }
+    // InformacaoComponent.quantidadeSelected = 1;
+
+    // this.cancelarFormButton = new FormControl('',[Validators.required,cancelarBtnFormValidator]);
+
+  }
+  toggleAllRows() {
+
+    if (this.isAllSelected()) {
+      this.selection.clear();
+      return;
+    }
+
+    this.selection.select(...this.dataSource.data);
+  }
+  checkboxLabel(row?: UserData): string {
+    if (!row) {
+      return `${this.isAllSelected() ? 'deselect' : 'select'} all`;
+    }
+    return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1}`;
+  }
+
+
+  constructor(public dialog: MatDialog) {
     this.cancelarFormButton = new FormControl('',[Validators.required,cancelarBtnFormValidator]);
-    
 
-   // Create 100 users
+    const users = Array.from({length: 100}, (_, k) => createNewUser(k + 1));
 
-   // Assign the data to the data source for the table to render
-   this.sortedData = this.desserts.slice();
+    this.dataSource = new MatTableDataSource(users);
   }
   positionOptions: TooltipPosition[] = ['below'];
   cancelarFormButton: any;
@@ -95,49 +157,41 @@ export class InformacaoComponent {
           data:{title: title, message:message, buttons:buttons}
         })
     }
-    if(typeDialog === 1){
-      
-    }else{
-      
-    }
-
-  }
-
-
-  sortData(sort: Sort) {
-    const data = this.desserts.slice();
-    if (!sort.active || sort.direction === '') {
-      this.sortedData = data;
-      return;
-    }
-
-    this.sortedData = data.sort((a, b) => {
-      const isAsc = sort.direction === 'asc';
-      switch (sort.active) {
-        case 'name': return compare(a.name, b.name, isAsc);
-        case 'calories': return compare(a.calories, b.calories, isAsc);
-        case 'fat': return compare(a.fat, b.fat, isAsc);
-        case 'carbs': return compare(a.carbs, b.carbs, isAsc);
-        case 'protein': return compare(a.protein, b.protein, isAsc);
-        default: return 0;
-      }
-    });
-  }
+  } 
 
 
   ngAfterViewInit() {
-
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
 
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
 }
-function compare(a: number | string, b: number | string, isAsc: boolean) {
-  return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+function createNewUser(id: number): UserData {
+  const name =
+    NAMES[Math.round(Math.random() * (NAMES.length - 1))] +
+    ' ' +
+    NAMES[Math.round(Math.random() * (NAMES.length - 1))].charAt(0) +
+    '.';
+
+  return {
+    id: id.toString(),
+    name: name,
+    progress: Math.round(Math.random() * 100).toString(),
+    fruit: FRUITS[Math.round(Math.random() * (FRUITS.length - 1))],
+  };
 }
 function cancelarBtnFormValidator(control: FormControl) {
   (1)
-  let quantidadeSelected = 0;
 
-  if (quantidadeSelected === 0) {
+
+  if (InformacaoComponent.quantidadeSelected === 0) {
     return {
       selectedItens: {
         selectedItens: false
