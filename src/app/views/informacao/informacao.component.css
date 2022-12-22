@@ -75,7 +75,7 @@ div.container div.table-wrapper{
     background-color: #ccc;
     display:flex;
     flex-flow:column nowrap;
-    padding: 1% 2%;
+    padding: 0% 2%;
     height: 90%;
     width: 100%;
     min-height: 500px;

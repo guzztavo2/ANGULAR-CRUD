@@ -20,8 +20,6 @@ export interface PeriodicElement {
   symbol: string;
 }
 
-var ELEMENT_DATA: informacao[] = informacao.gerarInformacoes(20);
-
 @Component({
   selector: 'app-informacao',
   templateUrl: './informacao.component.html',
@@ -53,24 +51,24 @@ export class InformacaoComponent implements AfterViewInit {
         'Você precisa selecionar os itens para deleta-los.',
         [{ buttonMessage: 'Ok', buttonColor: 'primary' }]
       );
-    } else {
-      this.openDialog(
-        2,
-        '150ms',
-        '250ms',
-        'Tudo certo!',
-        'Já vamos deletear os itens para você.',
-        [{ buttonMessage: 'Ok', buttonColor: 'warn' }]
-      );
-    }
+    } else this.remove(undefined);
   }
   gerarValores() {
-    this.openDialog(3, '150ms', '250ms', 'Uma pergunta antes de prosseguir:', 'Quantas informações você gostaria de adicionar?', undefined);
+    this.openDialog(
+      3,
+      '150ms',
+      '250ms',
+      'Uma pergunta antes de prosseguir:',
+      'Quantas informações você gostaria de adicionar?',
+      undefined
+    );
   }
-  listInformacoes!: informacao[];
 
   constructor(public dialog: MatDialog) {
-    this.listInformacoes = ELEMENT_DATA;
+    this.ELEMENT_DATA = informacao.gerarInformacoes(2);
+    this.ELEMENT_DATA.forEach((item) => {
+      this.dataSource.data.push(item);
+    });
   }
 
   router: Router = new Router();
@@ -83,17 +81,41 @@ export class InformacaoComponent implements AfterViewInit {
     'informacao',
     'dataCriacao',
     'dataAtualizacao',
+    '*',
   ];
+  ELEMENT_DATA: informacao[] = []; // informacao.gerarInformacoes(20);
+
   dataSource = new MatTableDataSource<informacao>();
   selection = new SelectionModel<informacao>(true, []);
 
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
+    const numRows = this.ELEMENT_DATA.length;
     return numSelected === numRows;
   }
-
+  remove(id: undefined | number | informacao) {
+    let AllData = this.dataSource.data;
+    let listRemove: informacao[] = [];
+    if (id === undefined) {
+      listRemove = this.selection.selected;
+    } else {
+      console.log(typeof id);
+      if (typeof id === 'number') {
+        listRemove.push(new informacao(undefined));
+        listRemove[0].id = id;
+      } else if (typeof id === 'object') {
+        listRemove.push(id);
+      }
+    }
+    listRemove.forEach((item) => {
+      AllData = AllData.filter(function (obj) {
+        return obj.id !== item.id;
+      });
+    });
+    this.dataSource.data = informacao.reorganizarID(AllData);
+    this.table.renderRows();
+  }
   /** Selects all rows if they are not all selected; otherwise clear selection. */
   toggleAllRows() {
     if (this.isAllSelected()) {
@@ -101,7 +123,7 @@ export class InformacaoComponent implements AfterViewInit {
       return;
     }
 
-    this.selection.select(...this.dataSource.data);
+    this.selection.select(...this.ELEMENT_DATA);
   }
 
   /** The label for the checkbox on the passed row */
@@ -122,7 +144,7 @@ export class InformacaoComponent implements AfterViewInit {
     message: any,
     buttons: any
   ): void {
-    var dialogRef!:any;
+    var dialogRef!: any;
 
     switch (typeDialog) {
       case 1:
@@ -133,10 +155,12 @@ export class InformacaoComponent implements AfterViewInit {
           exitAnimationDuration,
           data: { informacao: '' },
         });
-        dialogRef.afterClosed().subscribe((result:any) => {
+        dialogRef.afterClosed().subscribe((result: any) => {
           if (result !== undefined) {
-            console.log(result);
-            alert('a');
+            result = [new informacao(result)];
+            this.dataSource.data = informacao.reorganizarID(this.dataSource.data.concat(result));
+
+            this.table.renderRows();
           }
         });
         break;
@@ -155,23 +179,97 @@ export class InformacaoComponent implements AfterViewInit {
           minWidth: '350px',
           enterAnimationDuration,
           exitAnimationDuration,
-          data: { informacao: '',title: title, message: message },
+          data: { informacao: '', title: title, message: message },
         });
-        dialogRef.afterClosed().subscribe((result:any) => {
+        dialogRef.afterClosed().subscribe((result: any) => {
           if (result !== undefined) {
-            console.log(ELEMENT_DATA);
-            let itensGeridos = informacao.gerarInformacoes(Number.parseInt(result));
-            this.listInformacoes = itensGeridos;
-            console.log(ELEMENT_DATA);
+            let itensGeridos = informacao.gerarInformacoes(
+              Number.parseInt(result)
+            );
+            itensGeridos = informacao.reorganizarID(
+              this.dataSource.data.concat(itensGeridos)
+            );
+
+            this.dataSource.data = itensGeridos;
+
+            this.table.renderRows();
           }
-
-
-          });
+        });
         break;
     }
   }
+  asc: boolean = true;
+  PropertySort(property: string) {
+    let allData = this.dataSource.data;
+
+    switch (property) {
+      case 'id':
+        if (this.asc === true) {
+          allData.sort((a, b) => b.id - a.id);
+          this.asc = false;
+        } else {
+          allData.sort((a, b) => a.id - b.id);
+          this.asc = true;
+        }
+        break;
+        case 'dataCriacao':
+          if (this.asc === true) {
+            allData.sort((a, b) =>(b.dataCriacao !== undefined && a.dataCriacao !== undefined ? b.dataCriacao.getTime() - a.dataCriacao.getTime() : 0));
+            this.asc = false;
+          } else {
+            allData.sort((a, b) =>(a.dataCriacao !== undefined && b.dataCriacao !== undefined ? a.dataCriacao.getTime() - b.dataCriacao.getTime() : 0));
+            this.asc = true;
+          }
+          break;
+        case 'dataAtualizacao':
+          if (this.asc === true) {
+            allData.sort((a, b) =>(b.dataAtualizacao !== undefined && a.dataAtualizacao !== undefined ? b.dataAtualizacao.getTime() - a.dataAtualizacao.getTime() : 0));
+            this.asc = false;
+          } else {
+            allData.sort((a, b) =>(a.dataAtualizacao !== undefined && b.dataAtualizacao !== undefined ? a.dataAtualizacao.getTime() - b.dataAtualizacao.getTime() : 0));
+            this.asc = true;
+          }
+          break;
+        case 'informacao':
+          if (this.asc === true) {
+            allData = informacao.compare(allData, this.asc);
+            this.asc = false;
+          } else {
+            allData = informacao.compare(allData, this.asc);
+            this.asc = true;
+          }
+        break;
+      default:
+        if (
+          property === 'informacao' ||
+          property === 'dataCriacao' ||
+          property === 'dataAtualizacao'
+        ) {
+
+        }
+
+        break;
+    }
+
+    this.dataSource.data = allData;
+  }
+  getRangeLabel(page: number, pageSize: number, length: number): string {
+    if (length === 0) {
+      return `Página 1 of 1`;
+    }
+    const amountPages = Math.ceil(length / pageSize);
+    return `Page ${page + 1} of ${amountPages}`;
+  }
+
+
+
 
   ngAfterViewInit() {
+
+    this.paginator._intl.nextPageLabel = 'Proxima página';
+    this.paginator._intl.previousPageLabel = 'Página anterior';
+    this.paginator._intl.itemsPerPageLabel = "Informações por página:"
+
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
@@ -184,9 +282,6 @@ export class InformacaoComponent implements AfterViewInit {
     }
   }
 }
-
-
-
 
 @Component({
   selector: 'DialogAdicao',
@@ -229,9 +324,6 @@ export class customDialog {
   }
 }
 
-
-
-
 @Component({
   selector: 'DialogQuantidade',
   templateUrl: 'informacao.dialogQuantidade.html',
@@ -249,15 +341,14 @@ export class DialogQuantidade {
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     dialogRef.afterClosed().subscribe();
-
   }
-  keypressQuantidadeE(event:any):boolean{
+  keypressQuantidadeE(event: any): boolean {
     if (!`${event.target.value}${event.key}`.match(/^[0-9]{0,2}$/)) {
       event.preventDefault();
       event.stopPropagation();
       return false;
-  }
-  return true;
+    }
+    return true;
   }
 
   public exitDialog() {

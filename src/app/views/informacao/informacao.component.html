@@ -1,116 +1,139 @@
 <div class="container">
   <div color="primary" class="buttons_wrapp">
     <button
-    id="randomBtnValues"
-    (click)="this.gerarValores()"
-    color="accent"
-       mat-raised-button
-      matTooltip="Selecione o item, e clique aqui para remove-lo." [matTooltipPosition]="position.value!">
-
+      id="randomBtnValues"
+      (click)="this.gerarValores()"
+      color="accent"
+      mat-raised-button
+      matTooltip="Selecione o item, e clique aqui para remove-lo."
+      [matTooltipPosition]="position.value!"
+    >
       <mat-icon>add_outline</mat-icon>
       <span>Gerar Valores Aleatórios</span>
       <!-- (click)="openDialog(2,'150ms', '250ms','Não é possivel fazer isso ainda:','Você precisa selecionar os itens para deleta-los.',[{buttonMessage: 'Ok', buttonColor:'primary' }])" -->
-
     </button>
-      <button
+    <button
       (click)="this.btnRemoverAction($event.currentTarget)"
-        [color]="this.getColorSelected()"
-         mat-raised-button
-        matTooltip="Selecione o item, e clique aqui para remove-lo." [matTooltipPosition]="position.value!">
-
-        <mat-icon>delete_outline</mat-icon>
-        <span>Remover</span>
-        <!-- (click)="openDialog(2,'150ms', '250ms','Não é possivel fazer isso ainda:','Você precisa selecionar os itens para deleta-los.',[{buttonMessage: 'Ok', buttonColor:'primary' }])" -->
-
-      </button>
-
-
-    <button mat-raised-button color="warn" (click)="openDialog(1,'150ms', '200ms', undefined,undefined,undefined)"
-      matTooltip="Clique aqui para adicionar um item novo.">
-
-
+      [color]="this.getColorSelected()"
+      mat-raised-button
+      matTooltip="Selecione o item, e clique aqui para remove-lo."
+      [matTooltipPosition]="position.value!"
+    >
+      <mat-icon>delete_outline</mat-icon>
+      <span>Remover</span>
+      <!-- (click)="openDialog(2,'150ms', '250ms','Não é possivel fazer isso ainda:','Você precisa selecionar os itens para deleta-los.',[{buttonMessage: 'Ok', buttonColor:'primary' }])" -->
+    </button>
+    <button
+      mat-raised-button
+      color="warn"
+      (click)="openDialog(1, '150ms', '200ms', undefined, undefined, undefined)"
+      matTooltip="Clique aqui para adicionar um item novo."
+    >
       <mat-icon>note_add</mat-icon>
       <span>Adicicionar</span>
     </button>
-    <!-- <div *ngIf="this.selection.selected.length > 0">
-            <button [formControl]="cancelarFormButton" mat-raised-button color="primary"
-                matTooltip="Selecione o item, e clique aqui para remove-lo." [matTooltipPosition]="position.value!">
-                <mat-icon>delete_outline</mat-icon>
-                <span>Remover</span>
-
-            </button>
-            <button mat-raised-button color="warn"
-                (click)="openDialog(1,'150ms', '200ms', undefined,undefined,undefined)"
-                matTooltip="Clique aqui para adicionar um item novo." [matTooltipPosition]="position.value!">
-
-
-                <mat-icon>note_add</mat-icon>
-                <span>Adicicionar</span>
-            </button>
-          </div> -->
-
-
   </div>
 
   <div class="table-wrapper">
     <mat-form-field>
-      <mat-label>Filter</mat-label>
-      <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Mia" #input>
+      <mat-label>Buscar:</mat-label>
+      <input
+        matInput
+        (keyup)="applyFilter($event)"
+        placeholder="Ex: Hellium"
+        #input
+      />
     </mat-form-field>
-    <table mat-table [dataSource]="listInformacoes" class="mat-elevation-z8">
 
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
       <!-- Checkbox Column -->
       <ng-container matColumnDef="select">
         <th mat-header-cell *matHeaderCellDef>
-          <mat-checkbox (change)="$event ? toggleAllRows() : null" [checked]="selection.hasValue() && isAllSelected()"
-            [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
+          <mat-checkbox
+            (change)="$event ? toggleAllRows() : null"
+            [checked]="selection.hasValue() && isAllSelected()"
+            [indeterminate]="selection.hasValue() && !isAllSelected()"
+            [aria-label]="checkboxLabel()"
+          >
           </mat-checkbox>
         </th>
         <td mat-cell *matCellDef="let row">
-          <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
-            [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)">
+          <mat-checkbox
+            (click)="$event.stopPropagation()"
+            (change)="$event ? selection.toggle(row) : null"
+            [checked]="selection.isSelected(row)"
+            [aria-label]="checkboxLabel(row)"
+          >
           </mat-checkbox>
         </td>
       </ng-container>
 
       <!-- Position Column -->
       <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Id. </th>
-        <td mat-cell *matCellDef="let element"> {{element.id}} </td>
+        <th style="cursor:pointer; user-select: none;" (click)="PropertySort('id');" mat-header-cell *matHeaderCellDef mat-sort-header>Id.</th>
+        <td mat-cell *matCellDef="let element">{{ element.id }}</td>
       </ng-container>
 
       <!-- Name Column -->
       <ng-container matColumnDef="informacao">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Informação </th>
-        <td mat-cell *matCellDef="let element"> {{element.informacao}} </td>
+        <th style="cursor:pointer; user-select: none;" (click)="PropertySort('informacao');" mat-header-cell *matHeaderCellDef mat-sort-header>Informação</th>
+        <td mat-cell *matCellDef="let element">{{ element.informacao }}</td>
       </ng-container>
 
       <!-- Weight Column -->
       <ng-container matColumnDef="dataCriacao">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> Data de criação </th>
-        <td mat-cell *matCellDef="let element"> {{element.dataCriacao}} </td>
+        <th style="cursor:pointer; user-select: none;" (click)="PropertySort('dataCriacao');" mat-header-cell *matHeaderCellDef mat-sort-header>
+          Data de criação
+        </th>
+        <td mat-cell *matCellDef="let element">{{ element.dataCriacao.toLocaleString() }}</td>
       </ng-container>
 
       <!-- Symbol Column -->
       <ng-container matColumnDef="dataAtualizacao" mat-sort-header>
-        <th mat-header-cell *matHeaderCellDef> Data de Atualização </th>
-        <td mat-cell *matCellDef="let element"> {{element.dataAtualizacao}} </td>
+        <th style="cursor:pointer; user-select: none;" (click)="PropertySort('dataAtualizacao');" mat-header-cell *matHeaderCellDef>Data de Atualização</th>
+        <td mat-cell *matCellDef="let element">
+          {{ (element.dataAtualizacao !== undefined) ? element.dataAtualizacao.toLocaleString() : null }}
+        </td>
       </ng-container>
-
+      <ng-container matColumnDef="*" mat-sort-header>
+        <th mat-header-cell *matHeaderCellDef>Editar/Deletar</th>
+    <td mat-cell *matCellDef="let element">
+      <button mat-mini-fab matTooltip="Editar" color="warn" aria-label="Example mini fab with a heart icon">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button
+      (click)="this.remove(element.id)"
+      mat-mini-fab matTooltip="Deletar" color="primary" aria-label="Example mini fab with a heart icon">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </td>
+      </ng-container>
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="this.selection.toggle(row)">
-      </tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns"
+        (click)="this.selection.toggle(row)"
+      ></tr>
       <tr class="mat-row" *matNoDataRow>
-        <td class="mat-cell" colspan="4">Não teve informações encontradas com esse filtro: "{{input.value}}"</td>
+        <div *ngIf="input.value.length === 0">
+          <td style="padding:1%;" bgcolor="white" class="mat-cell" colspan="4">
+            Não há informações registradas nessa tabela.
+          </td>
+        </div>
+        <div *ngIf="input.value.length !== 0">
+          <td class="mat-cell" colspan="4">
+            Não obteve informações com esse filtro: "{{ input.value }}"
+          </td>
+        </div>
+
       </tr>
     </table>
     <mat-paginator
+      [length]="200"
+      [pageSizeOptions]="[10]"
 
-    [length]="200"
-    [pageSizeOptions]="[10]"
-    showFirstLastButtons
-    aria-label="Select page of periodic elements">
-</mat-paginator>
-
+      aria-label="Selecione a página de informações"
+    >
+    </mat-paginator>
   </div>
 </div>
