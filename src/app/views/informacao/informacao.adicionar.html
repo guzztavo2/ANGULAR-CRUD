@@ -1,48 +1,53 @@
 <div class="dialog">
-    <h1 mat-dialog-title color="warn">Adicionar informação</h1>
-    
-    <div class="contentDialog" mat-dialog-content>
+  <h1 mat-dialog-title color="warn">Adicionar informação</h1>
 
-       
+  <div class="contentDialog" mat-dialog-content>
+    <mat-form-field class="input">
+      <mat-label>Informação para ser adicionada:</mat-label>
+      <input
+        [(ngModel)]="data.informacao"
+        [formControl]="informacaoFormControl"
+        matInput
+        #message
+        minlength="5"
+        maxlength="256"
+        placeholder="Ex: Eu preciso de ajuda com..."
+      />
+      <mat-error *ngIf="informacaoFormControl.hasError('required')">
+        Informação é <strong>requerida</strong>
+      </mat-error>
+      <mat-error *ngIf="informacaoFormControl.hasError('minlength')">
+        A informação precisa ter no minimo <strong>5</strong> caracteres para
+        ser salva.
+      </mat-error>
+      <mat-hint align="start"
+        ><strong>Cuidado com suas informações pessoais.</strong>
+      </mat-hint>
+      <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
+    </mat-form-field>
+  </div>
 
-        <mat-form-field class="input">
-          <mat-label>Informação para ser adicionada:</mat-label>
-          <input [(ngModel)]="data.informacao" [formControl]="informacaoFormControl" matInput #message minlength="5"maxlength="256" placeholder="Ex: Eu preciso de ajuda com...">
-          <mat-error *ngIf="informacaoFormControl.hasError('required')">
-            Informação é <strong>requerida</strong>
-          </mat-error>
-          <mat-error *ngIf="informacaoFormControl.hasError('minlength')">
-            A informação precisa ter no minimo <strong>5</strong> caracteres para ser salva.
-          </mat-error>
-          <mat-hint align="start"><strong>Cuidado com suas informações pessoais.</strong> </mat-hint>
-          <mat-hint align="end">{{message.value.length}} / 256</mat-hint>
-        </mat-form-field>
-
-      
-
-          
-
-        
-    </div>
-
-
-    <div mat-dialog-actions>      
-        <button (click)="exitDialog()" mat-flat-button  color="primary"
-        matTooltip="Clique aqui para cancelar e não fazer alterações.."
-           [matTooltipPosition]="position.value!">
-          
-           <mat-icon>delete_outline</mat-icon>
-           <span>Cancelar</span>
-       </button>
-       <button mat-flat-button  
-       [mat-dialog-close]="data.informacao"
-       cdkFocusInitial 
-       color="warn"
-       matTooltip="Clique aqui e adicione um novo item."
-          [matTooltipPosition]="position.value!">
-          <mat-icon>save_outline</mat-icon>
-          <span>Salvar</span>
-      </button>
-    </div>
-
+  <div mat-dialog-actions>
+    <button
+      (click)="exitDialog()"
+      mat-flat-button
+      color="primary"
+      matTooltip="Clique aqui para cancelar e não fazer alterações.."
+      [matTooltipPosition]="position.value!"
+    >
+      <mat-icon>delete_outline</mat-icon>
+      <span>Cancelar</span>
+    </button>
+    <button
+      mat-flat-button
+      [mat-dialog-close]="data.informacao"
+      cdkFocusInitial
+      color="warn"
+      matTooltip="Clique aqui e adicione um novo item."
+      [matTooltipPosition]="position.value!"
+    >
+      <mat-icon>save_outline</mat-icon>
+      <span>Salvar</span>
+    </button>
+  </div>
 </div>

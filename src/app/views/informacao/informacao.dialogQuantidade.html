@@ -1,0 +1,44 @@
+<div class="dialog">
+  <mat-toolbar mat-dialog-title color="warn">
+      <span>{{data.title}}</span>
+    </mat-toolbar>
+  <div class="contentDialog" mat-dialog-content>
+      <h2>{{data.message}}</h2>
+  </div>
+
+  <mat-form-field>
+    <mat-label>Digite a quantidade</mat-label>
+    <input
+    [(ngModel)]="data.informacao"
+    (keypress)="keypressQuantidadeE($event);"
+    matInput #postalCode maxlength="2" placeholder="Ex. 12" value="">
+    <mat-hint align="end">{{postalCode.value.length}} / 2</mat-hint>
+  </mat-form-field>
+
+  <div mat-dialog-actions>
+
+        <button
+        (click)="exitDialog()"
+        mat-flat-button
+        color="primary"
+        matTooltip="Clique aqui para cancelar e não fazer alterações.."
+        [matTooltipPosition]="position.value!"
+      >
+        <mat-icon>delete_outline</mat-icon>
+        <span>Cancelar</span>
+      </button>
+      <button
+        mat-flat-button
+        [mat-dialog-close]="data.informacao"
+        cdkFocusInitial
+        color="warn"
+        matTooltip="Clique aqui e adicione um novo item."
+        [matTooltipPosition]="position.value!"
+      >
+      <mat-icon>save_outline</mat-icon>
+      Gerar
+      </button>
+
+  </div>
+
+</div>

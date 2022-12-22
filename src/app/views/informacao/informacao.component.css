@@ -6,13 +6,13 @@
 
 div.buttons_wrapp {
     height: 7%;
-    min-height: 80px;
+    min-height: 110px;
     background-color: white;
     display: flex;
     flex-flow: row wrap;
     justify-content: center;
     align-items: center;
-
+  padding:0.1%;
 }
 
 /* div.buttons_wrapp > mat-error {
@@ -24,9 +24,12 @@ div.buttons_wrapp {
 div.buttons_wrapp button {
     width: calc(100% / 2 - 2%);
     min-width: 250px;
-    margin: 0 1%;
+    margin: 0.5%;
+  padding: 0 1%;
 }
-
+div.buttons_wrapp button#randomBtnValues{
+width:100%;
+}
 div.dialog {
     width: 100%;
     min-width: 250px;

@@ -7,6 +7,7 @@ import { HeaderComponent } from './shared/header/header.component';
 import { FooterComponent } from './shared/footer/footer.component';
 import { InformacaoComponent } from './views/informacao/informacao.component';
 import { DialogAdicao } from './views/informacao/informacao.component';
+import { DialogQuantidade } from './views/informacao/informacao.component';
 import { customDialog } from './views/informacao/informacao.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,10 +19,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import {MatTableModule} from '@angular/material/table';
-import {MatPaginatorIntl, MatPaginatorModule} from '@angular/material/paginator';
 import {MatCheckboxModule} from '@angular/material/checkbox';
-import { Subject } from 'rxjs';
-import { $localize } from '@angular/localize/init';
+import {MatPaginatorModule} from '@angular/material/paginator';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -29,7 +29,8 @@ import { $localize } from '@angular/localize/init';
     FooterComponent,
     InformacaoComponent,
     DialogAdicao,
-    customDialog
+    customDialog,
+    DialogQuantidade
   ],
   imports: [
     BrowserModule,
@@ -46,15 +47,15 @@ import { $localize } from '@angular/localize/init';
     ReactiveFormsModule,
     MatInputModule,
     MatTableModule,
-    MatPaginatorModule,
     MatCheckboxModule,
     MatPaginatorModule
+
   ],
   exports: [
     MatFormFieldModule,
     MatInputModule
   ],
-  providers: [{provide: MatPaginatorIntl, useClass: MatPaginatorIntl}],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule {

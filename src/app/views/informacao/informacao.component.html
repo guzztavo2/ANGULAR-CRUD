@@ -1,8 +1,18 @@
 <div class="container">
   <div color="primary" class="buttons_wrapp">
+    <button
+    id="randomBtnValues"
+    (click)="this.gerarValores()"
+    color="accent"
+       mat-raised-button
+      matTooltip="Selecione o item, e clique aqui para remove-lo." [matTooltipPosition]="position.value!">
 
+      <mat-icon>add_outline</mat-icon>
+      <span>Gerar Valores Aleatórios</span>
+      <!-- (click)="openDialog(2,'150ms', '250ms','Não é possivel fazer isso ainda:','Você precisa selecionar os itens para deleta-los.',[{buttonMessage: 'Ok', buttonColor:'primary' }])" -->
+
+    </button>
       <button
-
       (click)="this.btnRemoverAction($event.currentTarget)"
         [color]="this.getColorSelected()"
          mat-raised-button
@@ -47,7 +57,7 @@
       <mat-label>Filter</mat-label>
       <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Mia" #input>
     </mat-form-field>
-    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+    <table mat-table [dataSource]="listInformacoes" class="mat-elevation-z8">
 
       <!-- Checkbox Column -->
       <ng-container matColumnDef="select">
