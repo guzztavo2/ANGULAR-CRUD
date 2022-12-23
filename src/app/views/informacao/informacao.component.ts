@@ -44,6 +44,8 @@ export class InformacaoComponent implements AfterViewInit {
   btnRemoverAction(currentBtn: any) {
     let currentColor: string = currentBtn.getAttribute('ng-reflect-color');
     if (currentColor === 'disabled') {
+      this.selection.clear();
+
       this.openDialog(
         2,
         '150ms',
@@ -70,10 +72,6 @@ export class InformacaoComponent implements AfterViewInit {
     this.ELEMENT_DATA.forEach((item) => {
       this.dataSource.data.push(item);
     });
-    this.headerCheckBox =
-      this.selection.hasValue() === true && this.isAllSelected() === true
-        ? true
-        : false;
   }
 
   router: Router = new Router();
@@ -96,16 +94,21 @@ export class InformacaoComponent implements AfterViewInit {
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.dataSource.data.length;
-    return numSelected === numRows;
+
+    if (this.dataSource._filterData === undefined) {
+      const numRows = this.dataSource.data.length;
+      return numSelected === numRows;
+    } else {
+      const numRows = this.dataSource.filteredData.length;
+      return numSelected === numRows;
+    }
   }
   remove(id: undefined | number | informacao) {
-    let AllData = this.dataSource.data;
+    let AllData = this.getSourceData();
     let listRemove: informacao[] = [];
     if (id === undefined) {
       listRemove = this.selection.selected;
     } else {
-      console.log(typeof id);
       if (typeof id === 'number') {
         listRemove.push(new informacao(undefined));
         listRemove[0].id = id;
@@ -119,7 +122,10 @@ export class InformacaoComponent implements AfterViewInit {
       });
     });
     this.dataSource.data = informacao.reorganizarID(AllData);
+    this.selection.clear();
     this.table.renderRows();
+    this.table.updateStickyHeaderRowStyles();
+    this.table.updateStickyColumnStyles();
   }
   /** Selects all rows if they are not all selected; otherwise clear selection. */
   toggleAllRows() {
@@ -127,8 +133,9 @@ export class InformacaoComponent implements AfterViewInit {
       this.selection.clear();
       return;
     }
-
-    this.selection.select(...this.dataSource.data);
+    if (this.dataSource.filteredData === undefined)
+      this.selection.select(...this.dataSource.data);
+    else this.selection.select(...this.dataSource.filteredData);
   }
 
   /** The label for the checkbox on the passed row */
@@ -136,9 +143,8 @@ export class InformacaoComponent implements AfterViewInit {
     if (!row) {
       return `${this.isAllSelected() ? 'deselect' : 'select'} all`;
     }
-    return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${
-      row.id + 1
-    }`;
+    return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.id + 1
+      }`;
   }
 
   openDialog(
@@ -150,6 +156,9 @@ export class InformacaoComponent implements AfterViewInit {
     buttons: any
   ): void {
     this.selection.clear();
+    this.table.renderRows();
+    this.table.updateStickyHeaderRowStyles();
+    this.table.updateStickyColumnStyles();
     var dialogRef!: any;
 
     switch (typeDialog) {
@@ -158,7 +167,6 @@ export class InformacaoComponent implements AfterViewInit {
           width: '45%',
           minWidth: '350px',
           minHeight: '250px',
-
           enterAnimationDuration,
           exitAnimationDuration,
           data: { informacao: '' },
@@ -169,8 +177,6 @@ export class InformacaoComponent implements AfterViewInit {
             this.dataSource.data = informacao.reorganizarID(
               this.dataSource.data.concat(result)
             );
-
-            this.table.renderRows();
           }
         });
         break;
@@ -212,7 +218,7 @@ export class InformacaoComponent implements AfterViewInit {
 
   deletarItem(info: informacao) {
     this.selection.clear();
-    let Alldata = this.dataSource.data;
+    let Alldata = this.getSourceData();
     let resultado: informacao[] = [];
     Alldata.forEach(function (item) {
       if (item !== info) resultado.push(item);
@@ -238,10 +244,9 @@ export class InformacaoComponent implements AfterViewInit {
       this.selection.clear();
     });
   }
-  headerCheckBox!: boolean;
   asc: boolean = true;
   PropertySort(property: string) {
-    let allData = this.dataSource.data;
+    let allData = this.getSourceData();
 
     switch (property) {
       case 'id':
@@ -249,11 +254,12 @@ export class InformacaoComponent implements AfterViewInit {
           allData.sort((a, b) => b.id - a.id);
           this.asc = false;
         } else {
-          allData.sort((a, b) => a.id - b.id);
+          this.setIDasc();
           this.asc = true;
         }
         break;
       case 'dataCriacao':
+        this.setIDasc();
         if (this.asc === true) {
           allData.sort((a, b) =>
             b.dataCriacao !== undefined && a.dataCriacao !== undefined
@@ -271,6 +277,7 @@ export class InformacaoComponent implements AfterViewInit {
         }
         break;
       case 'dataAtualizacao':
+        this.setIDasc();
         if (this.asc === true) {
           allData.sort((a, b) =>
             b.dataAtualizacao !== undefined && a.dataAtualizacao !== undefined
@@ -288,6 +295,8 @@ export class InformacaoComponent implements AfterViewInit {
         }
         break;
       case 'informacao':
+        this.setIDasc();
+
         if (this.asc === true) {
           allData = informacao.compare(allData, this.asc);
           this.asc = false;
@@ -296,18 +305,20 @@ export class InformacaoComponent implements AfterViewInit {
           this.asc = true;
         }
         break;
-      default:
-        if (
-          property === 'informacao' ||
-          property === 'dataCriacao' ||
-          property === 'dataAtualizacao'
-        ) {
-        }
-
-        break;
     }
 
     this.dataSource.data = allData;
+    this.table.renderRows();
+  }
+  getSourceData() {
+    if (this.dataSource.filteredData === undefined) return this.dataSource.data;
+    else return this.dataSource.filteredData;
+  }
+  setIDasc() {
+    let allData = this.getSourceData();
+    allData.sort((a: any, b: any) => a.id - b.id);
+    this.dataSource.data = allData;
+    this.table.renderRows();
   }
   getRangeLabel(page: number, pageSize: number, length: number): string {
     if (length === 0) {
@@ -328,7 +339,6 @@ export class InformacaoComponent implements AfterViewInit {
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
-
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
     }
