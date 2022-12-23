@@ -1,6 +1,10 @@
 # ANGULAR CRUD
  ## CRUD criado no framework front-end Angular, junto do Angular Material Framework
 
+###Funcionamentos do sistema desenvolvido
+![](https://github.com/guzztavo2/ANGULAR-CRUD/blob/main/imagens%5B%5DGitHub/Sequ%C3%AAncia%2001.gif);
+
+
 ### Requisitos para testar o projeto:
 - 1 - Instalar [NodeJS](https://nodejs.org/en/);
 - 2 - Instalar o [Angular](https://angular.io/);
