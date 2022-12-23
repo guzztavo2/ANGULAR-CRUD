@@ -10,7 +10,7 @@ import { TooltipPosition } from '@angular/material/tooltip';
 import { Validators } from '@angular/forms';
 import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource } from '@angular/material/table';
-import { SelectionModel } from '@angular/cdk/collections';
+import { DataSource, SelectionModel } from '@angular/cdk/collections';
 import { Router } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
 
@@ -70,6 +70,10 @@ export class InformacaoComponent implements AfterViewInit {
     this.ELEMENT_DATA.forEach((item) => {
       this.dataSource.data.push(item);
     });
+    this.headerCheckBox =
+      this.selection.hasValue() === true && this.isAllSelected() === true
+        ? true
+        : false;
   }
 
   router: Router = new Router();
@@ -92,7 +96,7 @@ export class InformacaoComponent implements AfterViewInit {
   /** Whether the number of selected elements matches the total number of rows. */
   isAllSelected() {
     const numSelected = this.selection.selected.length;
-    const numRows = this.ELEMENT_DATA.length;
+    const numRows = this.dataSource.data.length;
     return numSelected === numRows;
   }
   remove(id: undefined | number | informacao) {
@@ -145,6 +149,7 @@ export class InformacaoComponent implements AfterViewInit {
     message: any,
     buttons: any
   ): void {
+    this.selection.clear();
     var dialogRef!: any;
 
     switch (typeDialog) {
@@ -204,6 +209,18 @@ export class InformacaoComponent implements AfterViewInit {
         break;
     }
   }
+
+  deletarItem(info: informacao) {
+    this.selection.clear();
+    let Alldata = this.dataSource.data;
+    let resultado: informacao[] = [];
+    Alldata.forEach(function (item) {
+      if (item !== info) resultado.push(item);
+    });
+    resultado = informacao.reorganizarID(resultado);
+    this.dataSource.data = resultado;
+    this.table.renderRows();
+  }
   editarDialogActionButton(
     enterAnimationDuration: string,
     exitAnimationDuration: string,
@@ -221,7 +238,7 @@ export class InformacaoComponent implements AfterViewInit {
       this.selection.clear();
     });
   }
-
+  headerCheckBox!: boolean;
   asc: boolean = true;
   PropertySort(property: string) {
     let allData = this.dataSource.data;

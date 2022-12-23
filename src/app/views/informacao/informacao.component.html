@@ -49,7 +49,7 @@
         <th mat-header-cell *matHeaderCellDef>
           <mat-checkbox
             (change)="$event ? toggleAllRows() : null"
-            [checked]="selection.hasValue() && isAllSelected()"
+            [checked]="this.headerCheckBox"
             [indeterminate]="selection.hasValue() && !isAllSelected()"
             [aria-label]="checkboxLabel()"
           >
