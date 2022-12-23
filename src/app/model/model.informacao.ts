@@ -13,8 +13,15 @@ export class informacao {
   public getID(): number {
     return this.id;
   }
+  public getInformacao(fullInformacao: boolean | undefined): string {
+    if(this.informacao.length > 30){
+      if(fullInformacao === undefined || fullInformacao === false)
+        return this.informacao.substring(0, 30) + '...';
+    }
+    return this.informacao;
+  }
   private verificarData() {
-    if (this.dataCriacao == undefined) this.setDataCriacao(Date.now());
+    if (this.dataCriacao === undefined) this.setDataCriacao(Date.now());
     else this.SetDataAtualizacao(Date.now());
   }
   public atualizarInformacao(informacao: string) {
@@ -33,43 +40,16 @@ export class informacao {
     this.dataCriacao = new Date(dataCriacao);
   }
   private SetDataAtualizacao(dataAtualizacao: string | number) {
-    this.dataCriacao = new Date(dataAtualizacao);
+    this.dataAtualizacao = new Date(dataAtualizacao);
   }
   public static compare(objeto: informacao[], asc: boolean) {
     //console.log(objeto);
 
-      if (asc) objeto.sort((a, b) => compareFn(b.informacao, a.informacao));
-      else objeto.sort((a, b) => compareFn(a.informacao, b.informacao));
+    if (asc) objeto.sort((a, b) => compareFn(b.informacao, a.informacao));
+    else objeto.sort((a, b) => compareFn(a.informacao, b.informacao));
 
-      return objeto;
-    // switch (prop) {
+    return objeto;
 
-    //     break;
-    //   case 'dataCriacao':
-    //     if (asc){
-    //       objeto.sort((a, b) => compareFn(b.dataCriacao.getTime(), a.dataCriacao.getTime()));
-
-    //     }
-    //     else objeto.sort((a, b) => compareFn(a.dataCriacao.getTime(), b.dataCriacao.getTime()));
-
-    //     return objeto;
-    //     break;
-    //   case 'dataAtualizacao':
-    //     if (asc){
-    //       objeto.sort((a, b) =>
-    //         compareFn(b.dataAtualizacao.getTime(), a.dataAtualizacao.getTime())
-    //       );
-
-    //     }
-    //     else
-    //       objeto.sort((a, b) =>
-    //         compareFn(a.dataAtualizacao.getTime(), b.dataAtualizacao.getTime())
-    //       );
-
-    //     return objeto;
-    //     break;
-    // }
-    //return objeto;
     function compareFn(a: any, b: any) {
       if (a < b) {
         return -1;

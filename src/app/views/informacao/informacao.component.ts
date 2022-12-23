@@ -13,6 +13,7 @@ import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Router } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
+
 export interface PeriodicElement {
   name: string;
   position: number;
@@ -123,7 +124,7 @@ export class InformacaoComponent implements AfterViewInit {
       return;
     }
 
-    this.selection.select(...this.ELEMENT_DATA);
+    this.selection.select(...this.dataSource.data);
   }
 
   /** The label for the checkbox on the passed row */
@@ -151,6 +152,8 @@ export class InformacaoComponent implements AfterViewInit {
         dialogRef = this.dialog.open(DialogAdicao, {
           width: '45%',
           minWidth: '350px',
+          minHeight: '250px',
+
           enterAnimationDuration,
           exitAnimationDuration,
           data: { informacao: '' },
@@ -158,7 +161,9 @@ export class InformacaoComponent implements AfterViewInit {
         dialogRef.afterClosed().subscribe((result: any) => {
           if (result !== undefined) {
             result = [new informacao(result)];
-            this.dataSource.data = informacao.reorganizarID(this.dataSource.data.concat(result));
+            this.dataSource.data = informacao.reorganizarID(
+              this.dataSource.data.concat(result)
+            );
 
             this.table.renderRows();
           }
@@ -168,6 +173,8 @@ export class InformacaoComponent implements AfterViewInit {
         this.dialog.open(customDialog, {
           width: '25%',
           minWidth: '150px',
+          minHeight: '250px',
+
           enterAnimationDuration,
           exitAnimationDuration,
           data: { title: title, message: message, buttons: buttons },
@@ -177,6 +184,7 @@ export class InformacaoComponent implements AfterViewInit {
         dialogRef = this.dialog.open(DialogQuantidade, {
           width: '45%',
           minWidth: '350px',
+          minHeight: '250px',
           enterAnimationDuration,
           exitAnimationDuration,
           data: { informacao: '', title: title, message: message },
@@ -189,15 +197,31 @@ export class InformacaoComponent implements AfterViewInit {
             itensGeridos = informacao.reorganizarID(
               this.dataSource.data.concat(itensGeridos)
             );
-
             this.dataSource.data = itensGeridos;
-
             this.table.renderRows();
           }
         });
         break;
     }
   }
+  editarDialogActionButton(
+    enterAnimationDuration: string,
+    exitAnimationDuration: string,
+    informacao: informacao
+  ) {
+    const dialogRef = this.dialog.open(DialogEdicao, {
+      width: '50%',
+      minWidth: '350px',
+      minHeight: '250px',
+      enterAnimationDuration,
+      exitAnimationDuration,
+      data: { informacao: informacao },
+    });
+    dialogRef.afterClosed().subscribe(() => {
+      this.selection.clear();
+    });
+  }
+
   asc: boolean = true;
   PropertySort(property: string) {
     let allData = this.dataSource.data;
@@ -212,32 +236,48 @@ export class InformacaoComponent implements AfterViewInit {
           this.asc = true;
         }
         break;
-        case 'dataCriacao':
-          if (this.asc === true) {
-            allData.sort((a, b) =>(b.dataCriacao !== undefined && a.dataCriacao !== undefined ? b.dataCriacao.getTime() - a.dataCriacao.getTime() : 0));
-            this.asc = false;
-          } else {
-            allData.sort((a, b) =>(a.dataCriacao !== undefined && b.dataCriacao !== undefined ? a.dataCriacao.getTime() - b.dataCriacao.getTime() : 0));
-            this.asc = true;
-          }
-          break;
-        case 'dataAtualizacao':
-          if (this.asc === true) {
-            allData.sort((a, b) =>(b.dataAtualizacao !== undefined && a.dataAtualizacao !== undefined ? b.dataAtualizacao.getTime() - a.dataAtualizacao.getTime() : 0));
-            this.asc = false;
-          } else {
-            allData.sort((a, b) =>(a.dataAtualizacao !== undefined && b.dataAtualizacao !== undefined ? a.dataAtualizacao.getTime() - b.dataAtualizacao.getTime() : 0));
-            this.asc = true;
-          }
-          break;
-        case 'informacao':
-          if (this.asc === true) {
-            allData = informacao.compare(allData, this.asc);
-            this.asc = false;
-          } else {
-            allData = informacao.compare(allData, this.asc);
-            this.asc = true;
-          }
+      case 'dataCriacao':
+        if (this.asc === true) {
+          allData.sort((a, b) =>
+            b.dataCriacao !== undefined && a.dataCriacao !== undefined
+              ? b.dataCriacao.getTime() - a.dataCriacao.getTime()
+              : 0
+          );
+          this.asc = false;
+        } else {
+          allData.sort((a, b) =>
+            a.dataCriacao !== undefined && b.dataCriacao !== undefined
+              ? a.dataCriacao.getTime() - b.dataCriacao.getTime()
+              : 0
+          );
+          this.asc = true;
+        }
+        break;
+      case 'dataAtualizacao':
+        if (this.asc === true) {
+          allData.sort((a, b) =>
+            b.dataAtualizacao !== undefined && a.dataAtualizacao !== undefined
+              ? b.dataAtualizacao.getTime() - a.dataAtualizacao.getTime()
+              : 0
+          );
+          this.asc = false;
+        } else {
+          allData.sort((a, b) =>
+            a.dataAtualizacao !== undefined && b.dataAtualizacao !== undefined
+              ? a.dataAtualizacao.getTime() - b.dataAtualizacao.getTime()
+              : 0
+          );
+          this.asc = true;
+        }
+        break;
+      case 'informacao':
+        if (this.asc === true) {
+          allData = informacao.compare(allData, this.asc);
+          this.asc = false;
+        } else {
+          allData = informacao.compare(allData, this.asc);
+          this.asc = true;
+        }
         break;
       default:
         if (
@@ -245,7 +285,6 @@ export class InformacaoComponent implements AfterViewInit {
           property === 'dataCriacao' ||
           property === 'dataAtualizacao'
         ) {
-
         }
 
         break;
@@ -261,14 +300,10 @@ export class InformacaoComponent implements AfterViewInit {
     return `Page ${page + 1} of ${amountPages}`;
   }
 
-
-
-
   ngAfterViewInit() {
-
     this.paginator._intl.nextPageLabel = 'Proxima página';
     this.paginator._intl.previousPageLabel = 'Página anterior';
-    this.paginator._intl.itemsPerPageLabel = "Informações por página:"
+    this.paginator._intl.itemsPerPageLabel = 'Informações por página:';
 
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
@@ -351,6 +386,39 @@ export class DialogQuantidade {
     return true;
   }
 
+  public exitDialog() {
+    this.dialogRef.close();
+  }
+}
+
+@Component({
+  selector: 'DialogEdicao',
+  templateUrl: 'informacao.dialog.editar.html',
+  styleUrls: ['./informacao.component.css'],
+})
+export class DialogEdicao {
+  positionOptions: TooltipPosition[] = ['below'];
+  email = new FormControl('', [Validators.required, Validators.email]);
+  informacaoFormControl: any;
+  informacao!: string;
+  constructor(
+    public dialogRef: MatDialogRef<DialogAdicao>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {
+    console.log(data['informacao'].getInformacao());
+    let informacaoFormControl = new FormControl('', [Validators.required]);
+    this.informacaoFormControl = informacaoFormControl;
+  }
+  position = new FormControl(this.positionOptions[0]);
+  public salvarInformacoes(informacao: string) {
+    if (informacao !== undefined) {
+      console.log(this.data);
+      this.data['informacao'].atualizarInformacao(informacao);
+      console.log(this.data);
+    }
+
+    this.exitDialog();
+  }
   public exitDialog() {
     this.dialogRef.close();
   }

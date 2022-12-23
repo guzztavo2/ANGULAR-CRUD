@@ -10,7 +10,6 @@
     >
       <mat-icon>add_outline</mat-icon>
       <span>Gerar Valores Aleatórios</span>
-      <!-- (click)="openDialog(2,'150ms', '250ms','Não é possivel fazer isso ainda:','Você precisa selecionar os itens para deleta-los.',[{buttonMessage: 'Ok', buttonColor:'primary' }])" -->
     </button>
     <button
       (click)="this.btnRemoverAction($event.currentTarget)"
@@ -21,7 +20,6 @@
     >
       <mat-icon>delete_outline</mat-icon>
       <span>Remover</span>
-      <!-- (click)="openDialog(2,'150ms', '250ms','Não é possivel fazer isso ainda:','Você precisa selecionar os itens para deleta-los.',[{buttonMessage: 'Ok', buttonColor:'primary' }])" -->
     </button>
     <button
       mat-raised-button
@@ -37,7 +35,7 @@
   <div class="table-wrapper">
     <mat-form-field>
       <mat-label>Buscar:</mat-label>
-      <input
+      <input class="buscar"
         matInput
         (keyup)="applyFilter($event)"
         placeholder="Ex: Hellium"
@@ -77,7 +75,7 @@
       <!-- Name Column -->
       <ng-container matColumnDef="informacao">
         <th style="cursor:pointer; user-select: none;" (click)="PropertySort('informacao');" mat-header-cell *matHeaderCellDef mat-sort-header>Informação</th>
-        <td mat-cell *matCellDef="let element">{{ element.informacao }}</td>
+        <td mat-cell *matCellDef="let element">{{ element.getInformacao(undefined) }}</td>
       </ng-container>
 
       <!-- Weight Column -->
@@ -98,7 +96,8 @@
       <ng-container matColumnDef="*" mat-sort-header>
         <th mat-header-cell *matHeaderCellDef>Editar/Deletar</th>
     <td mat-cell *matCellDef="let element">
-      <button mat-mini-fab matTooltip="Editar" color="warn" aria-label="Example mini fab with a heart icon">
+      <button mat-mini-fab matTooltip="Editar" (click)="this.editarDialogActionButton('150ms','250ms',element);"
+        color="warn" aria-label="Example mini fab with a heart icon">
         <mat-icon>edit</mat-icon>
       </button>
       <button
@@ -116,12 +115,12 @@
       ></tr>
       <tr class="mat-row" *matNoDataRow>
         <div *ngIf="input.value.length === 0">
-          <td style="padding:1%;" bgcolor="white" class="mat-cell" colspan="4">
+          <td #info style="padding:1%;" bgcolor="white" class="mat-cell" colspan="4">
             Não há informações registradas nessa tabela.
           </td>
         </div>
         <div *ngIf="input.value.length !== 0">
-          <td class="mat-cell" colspan="4">
+          <td #info class="mat-cell" colspan="4">
             Não obteve informações com esse filtro: "{{ input.value }}"
           </td>
         </div>

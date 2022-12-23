@@ -5,7 +5,7 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HeaderComponent } from './shared/header/header.component';
 import { FooterComponent } from './shared/footer/footer.component';
-import { InformacaoComponent } from './views/informacao/informacao.component';
+import { InformacaoComponent, DialogEdicao } from './views/informacao/informacao.component';
 import { DialogAdicao } from './views/informacao/informacao.component';
 import { DialogQuantidade } from './views/informacao/informacao.component';
 import { customDialog } from './views/informacao/informacao.component';
@@ -30,7 +30,8 @@ import {MatPaginatorModule} from '@angular/material/paginator';
     InformacaoComponent,
     DialogAdicao,
     customDialog,
-    DialogQuantidade
+    DialogQuantidade,
+    DialogEdicao
   ],
   imports: [
     BrowserModule,

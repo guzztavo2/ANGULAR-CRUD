@@ -1,13 +1,12 @@
 <div class="dialog">
-  <h1 mat-dialog-title color="warn">Adicionar informação</h1>
+  <h1 mat-dialog-title color="warn">Editar Informação {{data['informacao'].getInformacao()}} ({{data['informacao'].getID()}})</h1>
 
   <div class="contentDialog" mat-dialog-content>
     <mat-form-field class="input">
-      <mat-label>Informação para ser adicionada:</mat-label>
+      <mat-label>Informação para ser editada:</mat-label>
       <input
-        [(ngModel)]="data.informacao"
+        [(ngModel)]="this.informacao"
         [formControl]="informacaoFormControl"
-        cdkFocusInitial
         matInput
         #message
         minlength="5"
@@ -30,20 +29,7 @@
 
   <div mat-dialog-actions>
     <button
-    mat-flat-button
-    [mat-dialog-close]="data.informacao"
-    cdkFocusInitial
-    color="warn"
-    cdkFocusRegionStart
-    matTooltip="Clique aqui e adicione um novo item."
-    [matTooltipPosition]="position.value!"
-  >
-    <mat-icon>save_outline</mat-icon>
-    <span>Salvar</span>
-  </button>
-    <button
-      (click)="exitDialog()"
-      cdkFocusRegionEnd
+      (click)="this.exitDialog()"
       mat-flat-button
       color="primary"
       matTooltip="Clique aqui para cancelar e não fazer alterações.."
@@ -52,6 +38,17 @@
       <mat-icon>delete_outline</mat-icon>
       <span>Cancelar</span>
     </button>
+    <button
+      mat-flat-button
 
+      (click)="this.salvarInformacoes(this.informacao)"
+      cdkFocusInitial
+      color="warn"
+      matTooltip="Clique aqui e atualize o item."
+      [matTooltipPosition]="position.value!"
+    >
+      <mat-icon>save_outline</mat-icon>
+      <span>Salvar</span>
+    </button>
   </div>
 </div>
